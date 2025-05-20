@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "all-in-one-slider/all-in-one-slider-block",
+  "version": "1.0.0",
+  "title": "Multi Builder Slider",
+  "category": "widgets",
+  "icon": "smiley",
+  "description": "This Block allows you to easily create and manage image/content slides.",
+  "example": {},
+  "supports": {
+    "html": false
+  },
+  "keywords": [
+    "slider",
+    "slide",
+    "aios",
+    "contet"
+  ],
+  "textdomain": "aios",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewStyle": "file:./view.css",
+  "viewScript": "file:./view.js"
+}
