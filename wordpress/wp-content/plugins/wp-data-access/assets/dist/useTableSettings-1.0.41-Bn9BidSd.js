@@ -1,0 +1,1 @@
+import{u as l}from"./hooks-1.0.41-sDnKeMy7.js";import{r as o,l as r}from"./lib-1.0.41-DFdWuh_n.js";const n=a=>{const t=l(s=>{var e;return((e=s.tables[a])==null?void 0:e.table)??o.table});return r.debug("tableSettings",t),t};export{n as u};

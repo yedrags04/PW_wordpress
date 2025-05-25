@@ -23,7 +23,7 @@ class WPDA_Query_Builder extends WPDA_Container {
     private function show_on_backend() {
         ?>
 
-            <div class="wrap wpda-explorer-backend">
+            <div class="wrap wpda-query-builder-backend">
 
                 <h1 class="wp-heading-inline" style="margin-bottom: 18px">
                     <?php 

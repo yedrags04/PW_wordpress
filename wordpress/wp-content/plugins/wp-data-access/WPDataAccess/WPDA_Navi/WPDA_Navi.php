@@ -217,7 +217,7 @@ namespace WPDataAccess\WPDA_Navi {
 								<li>Intuitive Table Builder for creating data tables with ease</li>
 								<li>Highly customizable Form Builder for designing data entry forms</li>
 								<li>Integrated Theme Builder to personalize app styling</li>
-								<li>Interactive Chart Builder for real-time data analysis</li>
+								<li>Interactive Chart Builder for real-time data analysis <span class="wpda-new"><i>NEW</i></span></li>
                                 <li>Visualize location data from SQL queries with the Map Builder <span class="wpda-new"><i>NEW</i></span></li>
 							</ul>
 						</div>
@@ -262,8 +262,8 @@ namespace WPDataAccess\WPDA_Navi {
 
 						<div class="wpda-navi-container-content-item-facts">
 							<ul>
+                                <li>Manage database connections, databases and table data</li>
 								<li>Explore local and remote databases</li>
-								<li>Manage table data</li>
 							</ul>
 						</div>
 					</div>
@@ -298,9 +298,10 @@ namespace WPDataAccess\WPDA_Navi {
 
 						<div class="wpda-navi-container-content-item-facts">
 							<ul>
-								<li>Write, store, execute and reuse SQL code</li>
-								<li>Execute DCL, DDL and DML commands</li>
-								<li>User must have the necessary credentials</li>
+								<li>Write, store, execute and reuse any SQL command</li>
+                                <li>Schedule SQL commands to run at specific intervals <span class="wpda-new"><i>NEW</i></span></li>
+								<li>Ask AI Assistant to help writing queries and solve errors <span class="wpda-new"><i>NEW</i></span></li>
+                                <li>Store queries privately or globally <span class="wpda-new"><i>NEW</i></span></li>
 							</ul>
 						</div>
 					</div>
@@ -326,6 +327,14 @@ namespace WPDataAccess\WPDA_Navi {
 						<div class="wpda-navi-container-content-item-facts whats-new">
 							<ul>
                                 <li>
+                                    <a href="https://wpdataaccess.com/docs/sql-query-builder/query-builder-getting-started/" target="_blank" class="whatsnew">
+                                    New SQL Query Builder with AI Assistant and scheduled queries
+                                    </a>
+                                </li>
+                                <li>
+                                    Edit date and time fields in MySQL date format <i class="fas fa-chevron-right"></i> <span class="wpda-new">Form Builder</span>
+                                </li>
+                                <li>
                                     Visualize location data on
                                     <a href="https://wpdataaccess.com/docs/map-builder/map-builder-getting-started/" target="_blank" class="whatsnew">
                                         Maps
@@ -338,14 +347,9 @@ namespace WPDataAccess\WPDA_Navi {
                                     </a>
                                 </li>
                                 <li>
+                                    New built-ins
                                     <a href="https://wpdataaccess.com/docs/built-ins/built-ins-overview/" target="_blank" class="whatsnew">
-                                        Built-in Functions for Hooks
-                                    </a>
-                                </li>
-                                <li>
-                                    New built-in
-                                    <a href="https://wpdataaccess.com/docs/built-ins/wpda-log/" target="_blank" class="whatsnew">
-                                        wpda.log
+                                        log, alert, confirm and snackbar
                                     </a>
                                     available in all hooks
                                 </li>

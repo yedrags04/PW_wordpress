@@ -570,8 +570,8 @@ class WPDA_Query_Builder {
         echo json_encode( $response );
     }
 
-    public function get_query_list( $exclude = '' ) {
-        $wpda_query_builder_data = get_user_meta( WPDA::get_current_user_id(), self::QUERY_BUILDER_OPTIONS );
+    public function get_query_list( $exclude = '', $user_id = null ) {
+        $wpda_query_builder_data = get_user_meta( ( null === $user_id ? WPDA::get_current_user_id() : $user_id ), self::QUERY_BUILDER_OPTIONS );
         if ( is_array( $wpda_query_builder_data ) && count( $wpda_query_builder_data ) > 0 ) {
             //phpcs:ignore - 8.1 proof
             $queries = $wpda_query_builder_data[0];
@@ -614,8 +614,12 @@ class WPDA_Query_Builder {
         update_option( self::QUERY_BUILDER_OPTIONS, $wpda_query_builder_data );
     }
 
-    public function get_query( $query_name ) {
-        $wpda_query_builder_data = $this->get_query_list();
+    public function get_query( $query_name, $user_id = null ) {
+        if ( null === $user_id ) {
+            $wpda_query_builder_data = $this->get_query_list();
+        } else {
+            $wpda_query_builder_data = $this->get_query_list( '', $user_id );
+        }
         if ( is_array( $wpda_query_builder_data ) && isset( $wpda_query_builder_data[$query_name] ) ) {
             return $wpda_query_builder_data[$query_name];
         } else {
@@ -637,7 +641,8 @@ class WPDA_Query_Builder {
         $query_name,
         $query_sql,
         $query_name_old,
-        $wpda_vqb = null
+        $wpda_vqb = null,
+        $params = null
     ) {
         $wpda_query_builder_data = $this->get_query_list();
         if ( '' !== $query_name_old && $query_name !== $query_name_old ) {
@@ -647,6 +652,7 @@ class WPDA_Query_Builder {
             'schema_name' => $schema_name,
             'query'       => $query_sql,
             'is_visual'   => null !== $wpda_vqb,
+            'params'      => $params,
         );
         $this->update_query_list( $wpda_query_builder_data );
     }
@@ -656,7 +662,8 @@ class WPDA_Query_Builder {
         $query_name,
         $query_sql,
         $query_name_old,
-        $wpda_vqb = null
+        $wpda_vqb = null,
+        $params = null
     ) {
         $wpda_query_builder_data = $this->get_query_list_global();
         if ( '' !== $query_name_old && $query_name !== $query_name_old ) {
@@ -666,6 +673,7 @@ class WPDA_Query_Builder {
             'schema_name' => $schema_name,
             'query'       => $query_sql,
             'is_visual'   => null !== $wpda_vqb,
+            'params'      => $params,
         );
         $this->update_query_list_global( $wpda_query_builder_data );
         //            if ( wpda_freemius()->can_use_premium_code__premium_only() ) {
@@ -750,18 +758,21 @@ class WPDA_Query_Builder {
         echo json_encode( $response );
     }
 
+    private function substitute_sql_params( $wpdadb, $query, $params ) {
+    }
+
     public function execute_query(
         $dbs,
         $query,
         $limit,
-        $protect
+        $protect,
+        $params
     ) {
         $response = array(
             'tabs'   => array(),
             'status' => null,
         );
-        $qb = new WPDA_Query_Builder();
-        if ( $qb->check_query( $protect, $dbs, $query ) ) {
+        if ( $this->check_query( $protect, $dbs, $query ) ) {
             // Execute query
             $wpdadb = WPDADB::get_db_connection( $dbs );
             if ( null !== $wpdadb ) {
@@ -820,7 +831,7 @@ class WPDA_Query_Builder {
                             $var_name = ( isset( $use_cmd[1] ) ? $use_cmd[1] : null );
                             if ( $var_name !== null ) {
                                 $vars[$var_name] = $tabs;
-                                $tmps[$var_name] = $qb->wpdavar_table( $wpdadb, $tabs[$i - 1], $var_name );
+                                $tmps[$var_name] = $this->wpdavar_table( $wpdadb, $tabs[$i - 1], $var_name );
                                 $exequery = false;
                             }
                             break;
@@ -828,7 +839,7 @@ class WPDA_Query_Builder {
                             $use_cmd = explode( ' ', trim( $sqlcmds[$i] ) );
                             $var_name = ( isset( $use_cmd[1] ) ? $use_cmd[1] : null );
                             if ( $var_name !== null ) {
-                                $wpdadb_saved = $qb->wpdatmp_table(
+                                $wpdadb_saved = $this->wpdatmp_table(
                                     $wpdadb,
                                     $tmps[$var_name],
                                     $tmps[$var_name]['data'],
@@ -874,7 +885,7 @@ class WPDA_Query_Builder {
                     $wpdadb->query( $query );
                 }
                 $response['cmd'] = $query;
-                $response['status'] = $wpdadb;
+                $response['status'] = clone $wpdadb;
             }
         } else {
             $response['status'] = '<strong>WP Data Access error:</strong> Query not allowed - WordPress tables are protected';

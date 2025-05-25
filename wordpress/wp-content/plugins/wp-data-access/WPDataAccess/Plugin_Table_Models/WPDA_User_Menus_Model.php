@@ -8,7 +8,6 @@
 
 namespace WPDataAccess\Plugin_Table_Models {
 
-	use PHPMailer\PHPMailer\Exception;
 	use WPDataAccess\WPDA;
 
 	/**

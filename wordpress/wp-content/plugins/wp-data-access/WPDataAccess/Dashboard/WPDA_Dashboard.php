@@ -1318,36 +1318,97 @@ Customize forms using templates"
      * @return void
      */
     protected function toolbar_sql() {
+        $current_query_builder_version = get_user_meta( WPDA::get_current_user_id(), 'wpda_query_builder_version', true );
         ?>
 			<div id="wpda-dashboard-toolbar" class="wpda-dashboard-toolbar" style="display:none">
 				<div class="wpda-nowrap">
 					<div>
-						<div>
-							<a href="javascript:tabNew()"
-							   class="wpda-dashboard-item wpda_tooltip"
-							   title="Create new query"
-							>
-								<i class="fas fa-plus-circle"></i>
-								<div>
-									Create new query
-								</div>
-							</a>
-						</div><div>
-							<a href="javascript:openQuery()"
-							   class="wpda-dashboard-item wpda_tooltip"
-							   title="Open existing query"
-							>
-								<i class="fas fa-folder-open"></i>
-								<div>
-									Open existing query
-								</div>
-							</a>
-						</div>
+                        <?php 
+        if ( 'old' === $current_query_builder_version ) {
+            ?>
+                            <div>
+                                <a href="javascript:tabNew()"
+                                   class="wpda-dashboard-item wpda_tooltip"
+                                   title="Create new query"
+                                >
+                                    <i class="fas fa-plus-circle"></i>
+                                    <div>
+                                        Create new query
+                                    </div>
+                                </a>
+                            </div><div>
+                                <a href="javascript:openQuery()"
+                                   class="wpda-dashboard-item wpda_tooltip"
+                                   title="Open existing query"
+                                >
+                                    <i class="fas fa-folder-open"></i>
+                                    <div>
+                                        Open existing query
+                                    </div>
+                                </a>
+                            </div>
+                            <?php 
+        } else {
+            ?>
+                            <div>
+                                <a href="javascript:void(0)"
+                                   onclick="ppActionOpenQueriesMenu(event)"
+                                   class="wpda-dashboard-item wpda_tooltip"
+                                   title="Create new query"
+                                >
+                                    <i class="fas fa-bars"></i>
+                                    <div>
+                                        Menu
+                                    </div>
+                                </a>
+                            </div><div>
+                                <a href="javascript:void(0)"
+                                   onclick="ppActionFullScreen()"
+                                   class="wpda-dashboard-item wpda_tooltip"
+                                   title="Switch to full screen mode"
+                                >
+                                    <i class="fas fa-expand"></i>
+                                    <div>
+                                        Full Screen
+                                    </div>
+                                </a>
+                            </div>
+                        <?php 
+        }
+        ?>
 					</div>
 				</div>
-				<?php 
-        $this->get_promotions( 'sql' );
+                <div class="wpda-promotion" style="font-size: 16px">
+                    <?php 
+        if ( 'old' !== $current_query_builder_version ) {
+            ?>
+                        <span
+                            style="display: flex; align-items: center; gap: 5px; white-space: nowrap;"
+                        >
+							<a href="?page=<?php 
+            echo esc_attr( WP_Data_Access_Admin::PAGE_QUERY_BUILDER );
+            ?>&qb=old"
+                               style="display: flex; align-items: center; gap: 5px; white-space: nowrap;"
+                            >
+								<i class="fas fa-toggle-on"></i>
+								<span>Switch to old Query Builder</span>
+							</a>
+						</span>
+                        <?php 
+        } else {
+            ?>
+                        <a href="?page=<?php 
+            echo esc_attr( WP_Data_Access_Admin::PAGE_QUERY_BUILDER );
+            ?>&qb=new"
+                           style="display: flex; align-items: center; gap: 5px;"
+                        >
+                            <i class="fas fa-toggle-off"></i>
+                            <span>Switch to new Query Builder</span>
+                        </a>
+                        <?php 
+        }
         ?>
+                </div>
 			</div>
 			<?php 
     }

@@ -941,3 +941,64 @@ const updateLegacyTools = () => {
 	jQuery("#wpda-legacy-tool-settings-legacy-tool-data").val(JSON.stringify(toolStatus));
 	jQuery("#wpda-legacy-tool-settings-form-data").submit();
 }
+
+const submitMailCallbackOk = (response, debug) => {
+	if (response.code!==undefined && response.message!==undefined) {
+		switch(response.code) {
+			case "ok":
+				jQuery("#debugInfoContainer").parent().parent().hide()
+				jQuery.notify(response.message, "success");
+				break;
+			case "error":
+				jQuery.notify(response.message, "error");
+				break;
+			default:
+				jQuery.notify("Application error! Please contact the plugin development team.", "error");
+		}
+
+		if (debug === true) {
+			jQuery("#debugInfoContainer").html(response.debug)
+			jQuery("#debugInfoContainer").parent().parent().show()
+		}
+	} else {
+		submitSettingsCallbackError(response);
+	}
+
+	jQuery('#mailSpinner').hide();
+}
+
+const submitMailCallbackError = (response) => {
+	if (response.code!==undefined && response.message!==undefined) {
+		switch(response.code) {
+			case "error":
+				jQuery.notify(response.message, "error");
+				break;
+			default:
+				jQuery.notify("Application error! Please contact the plugin development team.", "error");
+		}
+	} else {
+		jQuery.notify("Application error! Please contact the plugin development team.", "error");
+	}
+
+	jQuery('#mailSpinner').hide();
+}
+
+const sendMail = (to, subject, message, debug) => {
+	if (to.trim() === "" || subject.trim() === "" || message.trim() === "") {
+		jQuery.notify("Invalid function call! Missing arguments.", "error");
+		jQuery('#mailSpinner').hide();
+	} else {
+		wpda_rest_api(
+			"action/mail",
+			{
+				to: to,
+				subject: subject,
+				message: message,
+			},
+			function(response) {
+				submitMailCallbackOk(response, debug)
+			},
+			submitSettingsCallbackError
+		);
+	}
+}

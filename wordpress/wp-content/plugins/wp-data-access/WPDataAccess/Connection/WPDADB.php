@@ -347,7 +347,7 @@ namespace WPDataAccess\Connection {
 		 */
 		public static function get_db_connection( $schema_name ) {
 			global $wpdb;
-			if ( 'rdb:' === substr( $schema_name, 0, 4 ) ) {
+			if ( 'rdb:' === substr( (string) $schema_name, 0, 4 ) ) {
 				// Remote database (other ip|port).
 				self::load_remote_databases();
 				if ( ! isset( self::$db_connections[ $schema_name ] ) ) {

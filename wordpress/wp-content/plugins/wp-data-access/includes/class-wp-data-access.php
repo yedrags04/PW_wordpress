@@ -176,6 +176,44 @@ class WP_Data_Access {
         $this->loader->add_action( 'admin_action_wpda_query_builder_get_db_hints', $query_builder, 'get_db_hints' );
         $this->loader->add_action( 'admin_action_wpda_query_builder_set_db_hints', $query_builder, 'set_db_hints' );
         $this->loader->add_action( 'admin_action_wpda_query_builder_get_vqb', $query_builder, 'get_visual_query' );
+        // Mail service.
+        $wpda_mail_server = \WPDataAccess\Utilities\WPDA_Mail::get_option();
+        if ( isset( 
+            $wpda_mail_server['host'],
+            $wpda_mail_server['port'],
+            $wpda_mail_server['authenticate'],
+            $wpda_mail_server['encryption'],
+            $wpda_mail_server['skip_verify'],
+            $wpda_mail_server['username'],
+            $wpda_mail_server['password']
+         ) ) {
+            add_action(
+                'phpmailer_init',
+                function ( $phpmailer ) use($wpda_mail_server) {
+                    $phpmailer->isSMTP();
+                    $phpmailer->isHTML( false );
+                    $phpmailer->SMTPDebug = $wpda_mail_server['debug'] ?? 0;
+                    $phpmailer->Host = $wpda_mail_server['host'];
+                    $phpmailer->Port = $wpda_mail_server['port'];
+                    $phpmailer->SMTPAuth = 'on' === $wpda_mail_server['authenticate'];
+                    $phpmailer->SMTPSecure = $wpda_mail_server['encryption'];
+                    if ( 'on' === $wpda_mail_server['skip_verify'] ) {
+                        $phpmailer->SMTPOptions = array(
+                            'ssl' => array(
+                                'verify_peer'       => false,
+                                'verify_peer_name'  => false,
+                                'allow_self_signed' => true,
+                            ),
+                        );
+                    }
+                    $phpmailer->Username = $wpda_mail_server['username'];
+                    $phpmailer->Password = $wpda_mail_server['password'];
+                    $phpmailer->From = $wpda_mail_server['username'];
+                },
+                10,
+                1
+            );
+        }
         // Export action.
         $this->loader->add_action( 'admin_action_wpda_export', WPDA_Export::class, 'export' );
         // Dashboard and widgets.
@@ -457,6 +495,9 @@ class WP_Data_Access {
                 break;
             case 'system':
                 $wpda_settings_class_name = 'WPDA_Settings_SystemInfo';
+                break;
+            case 'mail':
+                $wpda_settings_class_name = 'WPDA_Settings_Mail';
                 break;
             default:
                 $wpda_settings_class_name = 'WPDA_Settings_Plugin';

@@ -51,8 +51,8 @@ namespace WPDataAccess {
 		/**
 		 * Option wpda_version and it's default value
 		 */
-		const OPTION_WPDA_VERSION         = array( 'wpda_version', '5.5.40' );
-		const OPTION_WPDA_CLIENT_VERSION  = array( 'wpda_client_version', '1.0.40' );
+		const OPTION_WPDA_VERSION         = array( 'wpda_version', '5.5.41' );
+		const OPTION_WPDA_CLIENT_VERSION  = array( 'wpda_client_version', '1.0.41' );
 		const OPTION_WPDA_UPGRADED        = array( 'wpda_upgraded', false );
 		/**
 		 * Option wpda_setup_error and it's default value

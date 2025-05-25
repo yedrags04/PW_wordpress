@@ -7,7 +7,6 @@
  */
 namespace WPDataAccess\Settings;
 
-use WPDataAccess\Utilities\WPDA_Import;
 /**
  * Class WPDA_Settings
  *
@@ -49,13 +48,6 @@ class WPDA_Settings {
     protected $current_tab;
 
     /**
-     * Reference to wpda import object
-     *
-     * @var WPDA_Import
-     */
-    protected $wpda_import;
-
-    /**
      * WPDA_Settings constructor
      *
      * Member $this->tabs is filled in the constructor to support i18n.
@@ -69,7 +61,7 @@ class WPDA_Settings {
      * @since   1.0.0
      */
     public function __construct( $current_tab ) {
-        // Get menu slag of current page.
+        // Get menu slug of current page.
         if ( isset( $_REQUEST['page'] ) ) {
             $this->page = sanitize_text_field( wp_unslash( $_REQUEST['page'] ) );
             // input var okay.
@@ -88,6 +80,7 @@ class WPDA_Settings {
             'uninstall'  => 'Uninstall',
             'repository' => 'Repository',
             'roles'      => 'Roles',
+            'mail'       => 'Mail',
             'system'     => 'System Info',
         );
     }

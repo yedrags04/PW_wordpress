@@ -860,6 +860,10 @@ class WPDA_Table extends WPDA_API_Core {
     }
 
     private function get_selected_columns( $column_names, $search_data_types ) {
+        if ( !is_array( $column_names ) ) {
+            return '*';
+            // select all columns
+        }
         // Check for geo columns
         $geometryColumns = array();
         if ( is_array( $search_data_types ) ) {

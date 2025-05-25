@@ -80,6 +80,10 @@ namespace WPDataAccess\API {
             $qb = new WPDA_QB();
             $qb->register_rest_routes();
 
+            // AI Assistant
+            $ai = new WPDA_AI();
+            $ai->register_rest_routes();
+
 		}
 
 	}

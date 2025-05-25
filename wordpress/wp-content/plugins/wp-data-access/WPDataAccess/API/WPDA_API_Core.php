@@ -410,9 +410,11 @@ abstract class WPDA_API_Core {
                 'type'              => 'string',
                 'description'       => __( 'Access (user | global) ', 'wp-data-access' ),
                 'sanitize_callback' => function ( $param ) {
-                    return ( 'global' === $param ? 'global' : 'user' );
+                    return ( 'global' === strtolower( $param ) ? 'global' : 'user' );
                 },
-                'validate_callback' => 'rest_validate_request_arg',
+                'validate_callback' => function ( $param ) {
+                    return 'global' === strtolower( $param ) || 'user' === strtolower( $param );
+                },
             ),
             'query'              => array(
                 'required'          => true,
@@ -435,6 +437,30 @@ abstract class WPDA_API_Core {
                 'description'       => __( 'Query uses Visual Query Builder', 'wp-data-access' ),
                 'sanitize_callback' => 'sanitize_text_field',
                 'validate_callback' => 'rest_validate_request_arg',
+            ),
+            'params'             => array(
+                'required'          => false,
+                'type'              => 'array',
+                'description'       => __( 'Cron job parameters', 'wp-data-access' ),
+                'sanitize_callback' => function ( $param ) {
+                    $params = array();
+                    foreach ( $param as $key => $value ) {
+                        if ( 'params' === $key || 'notify' === $key ) {
+                            // Sanitize custom parameters
+                            $custom_params = array();
+                            foreach ( $value as $param_key => $param_value ) {
+                                $custom_params[sanitize_text_field( $param_key )] = sanitize_text_field( $param_value );
+                            }
+                            $params[sanitize_text_field( $key )] = $custom_params;
+                        } else {
+                            $params[sanitize_text_field( $key )] = sanitize_text_field( $value );
+                        }
+                    }
+                    return $params;
+                },
+                'validate_callback' => function ( $param ) {
+                    return is_array( $param );
+                },
             ),
         );
     }
@@ -623,14 +649,20 @@ abstract class WPDA_API_Core {
         }
     }
 
-    protected function get_media( $dbs, $tbl, $columns ) {
+    protected function get_media(
+        $dbs,
+        $tbl,
+        $columns,
+        $prefix = ''
+    ) {
         $media = array();
         $wp_media = array();
         foreach ( $columns as $column ) {
             $media_type = WPDA_Media_Model::get_column_media( $tbl, $column['column_name'], $dbs );
+            $column_name = $prefix . $column['column_name'];
             switch ( $media_type ) {
                 case 'ImageURL':
-                    $media[$column['column_name']] = $media_type;
+                    $media[$column_name] = $media_type;
                     break;
                 case 'Hyperlink':
                     // Get table settings.
@@ -642,18 +674,18 @@ abstract class WPDA_API_Core {
                     }
                     // Check hyperlink format.
                     if ( isset( $table_settings['table_settings']['hyperlink_definition'] ) && 'text' === $table_settings['table_settings']['hyperlink_definition'] ) {
-                        $media[$column['column_name']] = 'HyperlinkURL';
+                        $media[$column_name] = 'HyperlinkURL';
                     } else {
-                        $media[$column['column_name']] = 'HyperlinkObject';
+                        $media[$column_name] = 'HyperlinkObject';
                     }
                     break;
                 default:
                     if ( false !== $media_type ) {
                         // Handle WordPress Media Library integration
-                        $media[$column['column_name']] = "WP-{$media_type}";
+                        $media[$column_name] = "WP-{$media_type}";
                     }
             }
-            $wp_media[$column['column_name']] = $media_type;
+            $wp_media[$column_name] = $media_type;
         }
         return [
             'media'    => $media,

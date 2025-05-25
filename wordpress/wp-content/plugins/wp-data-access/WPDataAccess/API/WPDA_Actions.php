@@ -6,6 +6,7 @@ use WPDataAccess\Connection\WPDADB;
 use WPDataAccess\Plugin_Table_Models\WPDA_Media_Model;
 use WPDataAccess\Plugin_Table_Models\WPDA_Table_Settings_Model;
 use WPDataAccess\Plugin_Table_Models\WPDA_User_Menus_Model;
+use WPDataAccess\Utilities\WPDA_Mail;
 use WPDataAccess\WPDA;
 class WPDA_Actions extends WPDA_API_Core {
     protected $file_pointer;
@@ -65,6 +66,47 @@ class WPDA_Actions extends WPDA_API_Core {
             'callback'            => array($this, 'action_import'),
             'permission_callback' => '__return_true',
         ) );
+        register_rest_route( WPDA_API::WPDA_NAMESPACE, 'action/mail', array(
+            'methods'             => array('POST'),
+            'callback'            => array($this, 'action_mail'),
+            'permission_callback' => '__return_true',
+            'args'                => array(
+                'to'      => array(
+                    'required'          => false,
+                    'type'              => 'string',
+                    'description'       => __( 'To', 'wp-data-access' ),
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'validate_callback' => 'rest_validate_request_arg',
+                ),
+                'subject' => array(
+                    'required'          => false,
+                    'type'              => 'string',
+                    'description'       => __( 'Subject', 'wp-data-access' ),
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'validate_callback' => 'rest_validate_request_arg',
+                ),
+                'message' => array(
+                    'required'          => false,
+                    'type'              => 'string',
+                    'description'       => __( 'Message', 'wp-data-access' ),
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'validate_callback' => 'rest_validate_request_arg',
+                ),
+            ),
+        ) );
+    }
+
+    public function action_mail( $request ) {
+        if ( !$this->current_user_can_access() ) {
+            return $this->unauthorized();
+        }
+        if ( !$this->current_user_token_valid( $request ) ) {
+            return $this->invalid_nonce();
+        }
+        $to = $request['to'];
+        $subject = $request['subject'];
+        $message = $request['message'];
+        return WPDA_Mail::send( $to, $subject, $message );
     }
 
     public function action_import( $request ) {

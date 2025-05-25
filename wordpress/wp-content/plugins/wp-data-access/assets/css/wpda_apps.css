@@ -244,3 +244,11 @@ div[role=presentation].MuiPopover-root.MuiModal-root input[type=checkbox].Privat
     border-color: transparent;
     box-shadow: unset;
 }
+
+/* Hide SQL Query Builder header when not in full screen mode */
+div.pp-container-query-builder > .pp-container > header {
+    display: none;
+}
+div.wrap.wpda-query-builder-backend h1.wp-heading-inline {
+    margin-bottom: 0 !important;
+}

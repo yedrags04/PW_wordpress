@@ -18,7 +18,6 @@ use WPDataAccess\Plugin_Table_Models\WPDA_Design_Table_Model;
 use WPDataAccess\Plugin_Table_Models\WPDA_Publisher_Model;
 use WPDataAccess\Plugin_Table_Models\WPDA_User_Menus_Model;
 use WPDataAccess\Premium\WPDAPRO_Data_Publisher\WPDAPRO_Data_Publisher_Manage_Styles;
-use WPDataAccess\Query_Builder\WPDA_Query_Builder;
 use WPDataAccess\Settings\WPDA_Settings;
 use WPDataAccess\Utilities\WPDA_Add_App_To_Menu;
 use WPDataAccess\Utilities\WPDA_Repository;
@@ -644,9 +643,15 @@ class WP_Data_Access_Admin {
             if ( self::PAGE_MAIN === $this->page && isset( $_REQUEST['de'] ) ) {
                 if ( 'new' === $_REQUEST['de'] ) {
                     update_user_meta( WPDA::get_current_user_id(), 'wpda_data_explorer', 'new' );
-                }
-                if ( 'old' === $_REQUEST['de'] ) {
+                } elseif ( 'old' === $_REQUEST['de'] ) {
                     delete_user_meta( WPDA::get_current_user_id(), 'wpda_data_explorer' );
+                }
+            }
+            if ( self::PAGE_QUERY_BUILDER === $this->page && isset( $_REQUEST['qb'] ) ) {
+                if ( 'new' === $_REQUEST['qb'] ) {
+                    update_user_meta( WPDA::get_current_user_id(), 'wpda_query_builder_version', 'new' );
+                } elseif ( 'old' === $_REQUEST['qb'] ) {
+                    update_user_meta( WPDA::get_current_user_id(), 'wpda_query_builder_version', 'old' );
                 }
             }
             // Specific list tables (and forms) can be made available for specific capabilities:
@@ -701,13 +706,14 @@ class WP_Data_Access_Admin {
                 }
             }
             // Add submenu for Query Builder.
+            $current_query_builder_version = get_user_meta( WPDA::get_current_user_id(), 'wpda_query_builder_version', true );
             $this->wpda_data_publisher_menu = add_submenu_page(
                 self::MAIN_PAGE_SLUG,
                 'WP Data Access',
                 'SQL Query Builder',
                 'manage_options',
                 self::PAGE_QUERY_BUILDER,
-                array($this, 'query_builder')
+                array($this, ( $current_query_builder_version === 'old' ? 'query_builder_old' : 'query_builder' ))
             );
             // Add submenu for Data Tables.
             $this->wpda_data_publisher_menu = add_submenu_page(
@@ -997,7 +1003,13 @@ class WP_Data_Access_Admin {
      */
     public function query_builder() {
         WPDA_Dashboard::add_dashboard();
-        $query_builder = new WPDA_Query_Builder();
+        $query_builder = new \WPDataAccess\Data_Apps\WPDA_Query_Builder();
+        $query_builder->show();
+    }
+
+    public function query_builder_old() {
+        WPDA_Dashboard::add_dashboard();
+        $query_builder = new \WPDataAccess\Query_Builder\WPDA_Query_Builder();
         $query_builder->show();
     }
 

@@ -15,7 +15,10 @@ namespace WPDataAccess\Utilities {
 					'timeout' => 60,
 				)
 			);
-			// var_dump($response);
+
+            if ( 'on' === WPDA::get_option( WPDA::OPTION_PLUGIN_DEBUG ) ) {
+                // WPDA::wpda_log_wp_error( $response );
+            }
 
 			if ( is_wp_error( $response ) ) {
 				WPDA::wpda_log_wp_error( json_encode( $response ) );

@@ -1288,6 +1288,9 @@ class WPDA_Apps extends WPDA_API_Core {
         }
         global $wpdb;
         $renamed = 0;
+        $debug_mode = 'on' === WPDA::get_option( WPDA::OPTION_PLUGIN_DEBUG );
+        $debug = array();
+        $errors = array();
         // Rename all occurrences in repository tables and apps
         $sqls = array(
             "update `{$wpdb->prefix}wpda_publisher` set `pub_schema_name` = %s where `pub_schema_name` = %s",
@@ -1297,16 +1300,53 @@ class WPDA_Apps extends WPDA_API_Core {
             "update `{$wpdb->prefix}wpda_menus` set `menu_schema_name` = %s where `menu_schema_name` = %s",
             "update `{$wpdb->prefix}wpda_table_design` set `wpda_schema_name` = %s where `wpda_schema_name` = %s",
             "update `{$wpdb->prefix}wpda_table_settings` set `wpda_schema_name` = %s where `wpda_schema_name` = %s",
-            "update `{$wpdb->prefix}wpda_container` set `cnt_dbs` = %s where `cnt_dbs` = %s"
+            "update `{$wpdb->prefix}wpda_app_container` set `cnt_dbs` = %s where `cnt_dbs` = %s"
         );
         foreach ( $sqls as $sql ) {
-            $renamed += $wpdb->query( $wpdb->prepare( $sql, array($dbs_destination, $dbs_source) ) );
+            $result = $wpdb->query( $wpdb->prepare( $sql, array($dbs_destination, $dbs_source) ) );
+            $renamed += $result;
+            if ( $debug_mode ) {
+                $debug[] = array(
+                    'sql'    => $sql,
+                    'result' => $result,
+                );
+            }
+            if ( '' !== $wpdb->last_error ) {
+                $errors[] = array(
+                    'sql'   => $sql,
+                    'error' => $wpdb->last_error,
+                );
+            }
         }
-        $sql_content = array("update `{$wpdb->prefix}wpda_container` set `cnt_table` = replace(`cnt_table`, '\"dbs\":\"%1s\"', '\"dbs\":\"%1s\"') where `cnt_table` like '%\"dbs\":\"%1s\"%'", "update `{$wpdb->prefix}wpda_container` set `cnt_form` = replace(`cnt_form`, '\"dbs\":\"%1s\"', '\"dbs\":\"%1s\"') where `cnt_form` like '%\"dbs\":\"%1s\"%'");
+        $sql_content = array("update `{$wpdb->prefix}wpda_app_container` set `cnt_table` = replace(`cnt_table`, '\"dbs\":\"%1s\"', '\"dbs\":\"%1s\"') where `cnt_table` like '%\"dbs\":\"%1s\"%'", "update `{$wpdb->prefix}wpda_app_container` set `cnt_form` = replace(`cnt_form`, '\"dbs\":\"%1s\"', '\"dbs\":\"%1s\"') where `cnt_form` like '%\"dbs\":\"%1s\"%'");
         foreach ( $sql_content as $sql ) {
-            $renamed += $wpdb->query( $wpdb->prepare( $sql, array($dbs_source, $dbs_destination, $dbs_source) ) );
+            $result = $wpdb->query( $wpdb->prepare( $sql, array($dbs_source, $dbs_destination, $dbs_source) ) );
+            $renamed += $result;
+            if ( $debug_mode ) {
+                $debug[] = array(
+                    'sql'    => $sql,
+                    'result' => $result,
+                );
+            }
+            if ( '' !== $wpdb->last_error ) {
+                $errors[] = array(
+                    'sql'   => $sql,
+                    'error' => $wpdb->last_error,
+                );
+            }
         }
-        return $this->WPDA_Rest_Response( sprintf( __( 'Successfully renamed %s database occurrences', 'wp-data-access' ), $renamed ) );
+        $context = array();
+        if ( $debug_mode ) {
+            $context['debug'] = $debug;
+        }
+        if ( 0 < count( $errors ) ) {
+            $context['errors'] = $errors;
+            return new \WP_Error('error', 'Failed renaming database', array(
+                'status'  => 401,
+                'context' => $context,
+            ));
+        }
+        return $this->WPDA_Rest_Response( sprintf( __( 'Successfully renamed %s database occurrences', 'wp-data-access' ), $renamed ), null, $context );
     }
 
     public function app_chart_data( $request ) {

@@ -9,8 +9,8 @@ namespace WPDataAccess\Settings {
 	class WPDA_Settings_DataBackup extends WPDA_Settings {
 
 		// Dropbox app client id and secret (necessary for registration)
-		const DROPBOX_CLIENT_ID     = 'rp1wxasy1irf3wf'; // 'f6e7znb7qfwaqjh'; // 'rv5japeynhpzmyy';
-		const DROPBOX_CLIENT_SECRET = 'm9ltsxehdpgepv8'; // '0vzaidexrtcede4'; // 'v45glikrzr6h62z';
+		const DROPBOX_CLIENT_ID     = 'rp1wxasy1irf3wf';
+		const DROPBOX_CLIENT_SECRET = 'm9ltsxehdpgepv8';
 
 		/**
 		 * Add data backup tab content
